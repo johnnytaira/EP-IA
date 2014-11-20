@@ -3,12 +3,8 @@ package br.com.patricia.data;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 
 
 /**
@@ -105,10 +101,8 @@ public class Reader {
 			
 		}
 		
-		dataSource.getId().add(id);
-		dataSource.getSentiment().add(sentiment);
-		dataSource.getText().add(text.toString());
-		
+		dataSource.getSentiment().put(id, sentiment);
+		dataSource.getText().put(id, text.toString());
 	
 	}
 	

@@ -1,10 +1,8 @@
 package br.com.patricia.test;
 
-import java.util.Scanner;
-
 import br.com.patricia.data.DataSource;
 import br.com.patricia.data.Reader;
-import br.com.patricia.util.Numericals;
+import br.com.patricia.data.TextManipulator;
 
 /**
  * Classe para realização de testes.
@@ -16,10 +14,11 @@ public class Test {
 	public static void main(String[] args) {
 		DataSource datasource = new DataSource();
 		Reader reader = new Reader(datasource);
-		reader.readCSV("/Users/Johnny Taira/Desktop/Sentiment Analysis Dataset.csv");
+		reader.readCSV("/Users/Johnny Taira/Desktop/dummy.csv");
 		
-		System.out.println(datasource.getId().size());
-		System.out.println(datasource.getText().size());
+		TextManipulator manipulator = new TextManipulator(datasource);
+		
+		manipulator.wordCounter();
 		
 	}
 	
