@@ -30,7 +30,7 @@ public class Reader {
 	 * @param documentPath
 	 */
 	public void readCSV(String documentPath){
-		
+		int size = 0;
 		try {
 			Scanner sc = new Scanner(new FileReader(documentPath));
 			sc.nextLine();
@@ -38,15 +38,19 @@ public class Reader {
 			while(sc.hasNext()){
 				String linha = sc.nextLine();
 				stringManipulator(linha);
-				
+				size ++;
 			}
-			
+		
+			dataSource.setSize(size);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch(IOException e){
 			e.printStackTrace();
 		}
+		
+		
+		
 		
 	}
 	
@@ -63,6 +67,7 @@ public class Reader {
 		int count = 0;
 		Integer id = 0;
 		Integer sentiment = 0;
+		
 		
 		StringBuilder text = new StringBuilder();
 		
@@ -103,7 +108,8 @@ public class Reader {
 		
 		dataSource.getSentiment().put(id, sentiment);
 		dataSource.getText().put(id, text.toString());
-	
+		
 	}
+	
 	
 }

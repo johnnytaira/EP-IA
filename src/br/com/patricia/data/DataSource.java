@@ -13,12 +13,21 @@ public class DataSource {
 	
 	private Map<Integer, Integer> sentiment;
 	private Map<Integer, String> text;
+	private int size;
 	
 	public DataSource(){
 		this.sentiment = new HashMap<Integer, Integer>();
 		this.text = new HashMap<Integer, String>();
 	}
+	
+	public int getSize(){
+		return this.size;
+	}
 
+	public void setSize(int size){
+		this.size = size;
+	}
+	
 	public Map<Integer, Integer> getSentiment() {
 		return sentiment;
 	}
