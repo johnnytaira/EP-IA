@@ -58,12 +58,17 @@ public class TextManipulator {
 						wordNegativeOccurrences.put(word, 1);
 					}
 					
+					if(!wordPositiveOccurrences.containsKey(word))
+						wordPositiveOccurrences.put(word, 0);
+					
 				}else{
 					if (wordPositiveOccurrences.containsKey(word)){
 						wordPositiveOccurrences.put(word, wordPositiveOccurrences.get(word) + 1);
 					}else{
 						wordPositiveOccurrences.put(word, 1);
 					}
+					if(!wordNegativeOccurrences.containsKey(word))
+						wordNegativeOccurrences.put(word, 0);
 				}
 				
 				totalOccurrences++;
