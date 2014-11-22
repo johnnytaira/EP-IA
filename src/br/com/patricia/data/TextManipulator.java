@@ -16,25 +16,29 @@ public class TextManipulator {
 	private DataSource dataSource;
 	private Map<String, Integer> wordPositiveOccurrences;
 	private Map<String, Integer> wordNegativeOccurrences;
-	private long totalOccurrences;
+	private int totalPositiveOccurrences;
+	private int totalNegativeOccurrences;
 	
 	public TextManipulator(DataSource dataSource){
 		this.dataSource = dataSource;
 		this.wordPositiveOccurrences = new TreeMap<String, Integer>();
 		this.wordNegativeOccurrences = new TreeMap<String, Integer>();
-		this.totalOccurrences = 0;
 	}
 	
 	public Map<String, Integer> getWordPositiveOccurrences(){
 		return this.wordPositiveOccurrences;
 	}
 	
-	public long getTotalOccurrences(){
-		return this.totalOccurrences;
+	public int getTotalPositiveOccurrences(){
+		return this.totalPositiveOccurrences;
 	}
 	
 	public Map<String, Integer> getWordNegativeOccurrences(){
 		return this.wordNegativeOccurrences;
+	}
+	
+	public int getTotalNegativeOccurrences(){
+		return this.totalNegativeOccurrences;
 	}
 	
 	
@@ -58,6 +62,9 @@ public class TextManipulator {
 						wordNegativeOccurrences.put(word, 1);
 					}
 					
+					totalNegativeOccurrences++;
+	
+					
 					if(!wordPositiveOccurrences.containsKey(word))
 						wordPositiveOccurrences.put(word, 0);
 					
@@ -67,11 +74,13 @@ public class TextManipulator {
 					}else{
 						wordPositiveOccurrences.put(word, 1);
 					}
+					
+					totalPositiveOccurrences++;
+					
 					if(!wordNegativeOccurrences.containsKey(word))
 						wordNegativeOccurrences.put(word, 0);
 				}
-				
-				totalOccurrences++;
+	
 			}
 			
 			sc.close();

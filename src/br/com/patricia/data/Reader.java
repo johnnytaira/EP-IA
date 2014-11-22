@@ -2,7 +2,6 @@ package br.com.patricia.data;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -40,17 +39,12 @@ public class Reader {
 				stringManipulator(linha);
 				size ++;
 			}
-		
+			sc.close();
 			dataSource.setSize(size);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch(IOException e){
-			e.printStackTrace();
 		}
-		
-		
-		
 		
 	}
 	

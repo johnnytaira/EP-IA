@@ -22,7 +22,7 @@ public class DataSourceFactory {
 	public DataSourceFactory(DataSource dataSource){
 		trainingSet = new DataSource();
 		testingSet = new DataSource();
-		getTrainingSet(dataSource);
+		divideDataSourceHoldout(dataSource);
 	}
 	
 	
@@ -34,8 +34,12 @@ public class DataSourceFactory {
 		return testingSet;
 	}
 	
-
-	private static void getTrainingSet(DataSource dataSource){
+	/**
+	 * Divide o dataSource dado como parâmetro em dois grupos: treinamento e teste. 
+	 * Ambos podem ser acessados via getters and setters.
+	 * @param dataSource
+	 */
+	private static void divideDataSourceHoldout(DataSource dataSource){
 		Map<Integer, String> texts = dataSource.getText();
 		Map<Integer, Integer> sentiments = dataSource.getSentiment();
 		
@@ -44,7 +48,8 @@ public class DataSourceFactory {
 		Map<Integer, String> trainingTexts = new HashMap<Integer, String>();
 		Map<Integer, Integer> trainingSentiments = new HashMap<Integer, Integer>();
 		for (int i = 0; i < (2 * dataSource.getSize()) / 3; i++){
-			int number = random.nextInt(dataSource.getSize());
+			int range = dataSource.getSize() - 1 + 1;
+			int number = random.nextInt(range) + 1;
 			trainingTexts.put(number, texts.get(number));
 			trainingSentiments.put(number, sentiments.get(number));
 		}
