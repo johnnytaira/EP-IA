@@ -9,7 +9,6 @@ tmp/
 #Classpath
 .classpath
 
-
 # Local configuration file (sdk path, etc)
 local.properties
 
