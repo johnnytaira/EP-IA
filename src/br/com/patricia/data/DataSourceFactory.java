@@ -1,76 +1,108 @@
 package br.com.patricia.data;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 
 /**
- * Classe responsável pela fabricação de duas DataSources:uma para treinamento e uma para testes, seguindo a documentação
- * do EP de IA.
+ * Classe responsável pela criação das dataSources de treinamento e teste, tanto no método holdout
+ * quanto no método r-fold crossvalidation.
  * <p> Usa métodos da biblioteca {@link org.apache.commons}
  * @author Johnny Taira
  *
  */
 public class DataSourceFactory {
 	
-	private static DataSource trainingSet;
-	private static DataSource testingSet;
+	private static List<DataSource> dataSources;
 	
+	
+	/**
+	 * Construtor para a criação das partições usando o método holdout
+	 * @param dataSource conjunto de dados original
+	 */
 	public DataSourceFactory(DataSource dataSource){
-		trainingSet = new DataSource();
-		testingSet = new DataSource();
-		divideDataSourceHoldout(dataSource);
-	}
-	
-	
-	public DataSource getTrainingSet(){
-		return trainingSet;
-	}
-	
-	public DataSource getTestingSet(){
-		return testingSet;
+		dataSources = new ArrayList<DataSource>();
+		particiona(dataSource);
 	}
 	
 	/**
-	 * Divide o dataSource dado como parâmetro em dois grupos: treinamento e teste. 
-	 * Ambos podem ser acessados via getters and setters.
+	 * Construtor para a criação das partições usando o método crossvalidation
+	 * @param dataSource conjunto de dados original
+	 * @param folds número de partições
+	 */
+	public DataSourceFactory(DataSource dataSource, int folds){
+		dataSources = new ArrayList<DataSource>();
+		particiona(dataSource, folds);
+	}
+	
+	public List<DataSource> getDataSources(){
+		return dataSources;
+	}
+	
+	/**
+	 * Particionamento no método holdout. São divididos em três partições, sendo que 
+	 * posteriormente ocorrerá o merge necessário.
 	 * @param dataSource
 	 */
-	private static void divideDataSourceHoldout(DataSource dataSource){
-		Map<Integer, String> texts = dataSource.getText();
-		Map<Integer, Integer> sentiments = dataSource.getSentiment();
+	private static void particiona(DataSource dataSource){
+		particiona(dataSource, 3);
+	}
+	/**
+	 * Particionamento no método cross-validation.
+	 * @param dataSource
+	 * @param folds
+	 */
+	private static void particiona(DataSource dataSource, int folds){
+		Set<Integer> dataSourceIds = dataSource.getText().keySet();
+		List<Integer> dataSourceIdsList = new ArrayList<Integer>(dataSourceIds);
+		Collections.shuffle(dataSourceIdsList);
 		
-		Random random = new Random();
+		List<List<Integer>> partitions = new LinkedList<List<Integer>>(ListUtils.partition(dataSourceIdsList, dataSourceIdsList.size()/(folds)));
 		
-		Map<Integer, String> trainingTexts = new HashMap<Integer, String>();
-		Map<Integer, Integer> trainingSentiments = new HashMap<Integer, Integer>();
-		for (int i = 0; i < (2 * dataSource.getSize()) / 3; i++){
-			int range = dataSource.getSize() - 1 + 1;
-			int number = random.nextInt(range) + 1;
-			trainingTexts.put(number, texts.get(number));
-			trainingSentiments.put(number, sentiments.get(number));
+		List<Integer> union = ListUtils.union(partitions.get(0), partitions.get(partitions.size() - 1));
+		partitions.remove(partitions.get(0));
+		partitions.remove(partitions.size() - 1);
+		partitions.add(union);
+		for(List<Integer> partition : partitions){
+			DataSource data = new DataSource();
+			Map<Integer, Integer> sentiments = new HashMap<Integer, Integer>();
+			Map<Integer, String> texts = new HashMap<Integer, String>();
+			for(int id : partition){
+				sentiments.put(id, dataSource.getSentiment().get(id));
+				texts.put(id, dataSource.getText().get(id));
+			}
+			
+			data.getSentiment().putAll(sentiments);
+			data.getText().putAll(texts);
+			data.setSize(partition.size());
+			dataSources.add(data);
 		}
 		
-		trainingSet.getSentiment().putAll(trainingSentiments);
-		trainingSet.getText().putAll(trainingTexts);
-		trainingSet.setSize((2 * dataSource.getSize()) / 3);
 		
-		Collection<Integer> set = CollectionUtils.subtract(sentiments.keySet(), trainingSentiments.keySet());
+	}
+	
+	/**
+	 * Método para unir um conjunto de {@link DataSource}. 
+	 * @param dataSources o conjunto de {@link DataSource} a ser mergeado
+	 * @return as dataSources mergeadas
+	 */
+	public DataSource mergeDataSources(List<DataSource> dataSources){
+		DataSource dataSource = new DataSource();
 		
-		
-		Map<Integer, String> testingTexts = new HashMap<Integer, String>();
-		Map<Integer, Integer> testingSentiments = new HashMap<Integer, Integer>();
-		for (int i : set){
-			testingTexts.put(i, texts.get(i));
-			testingSentiments.put(i, sentiments.get(i));
+		for(DataSource data : dataSources){
+			dataSource.getSentiment().putAll(data.getSentiment());
+			dataSource.getText().putAll(data.getText());
+			dataSource.setSize(dataSource.getSize()+ data.getSize());
 		}
 		
-		testingSet.getSentiment().putAll(testingSentiments);
-		testingSet.getText().putAll(trainingTexts);
-		testingSet.setSize(dataSource.getSize() - trainingSet.getSize());
+		return dataSource;
+			
 	}
 	
 }

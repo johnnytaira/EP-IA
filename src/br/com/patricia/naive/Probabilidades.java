@@ -1,7 +1,9 @@
 package br.com.patricia.naive;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import br.com.patricia.data.DataSource;
@@ -17,10 +19,13 @@ import br.com.patricia.data.TextManipulator;
  */
 public class Probabilidades {
 
-	private int negativeFrequency;
-	private int positiveFrequency;
 	private BayesianModel positiveModel;
 	private BayesianModel negativeModel;
+	private Map<Integer, Integer> classificationMap; 
+	
+	public Probabilidades(TextManipulator manipulator){
+		this.manipulator = manipulator;
+	}
 	
 	public BayesianModel getPositiveModel() {
 		return positiveModel;
@@ -37,29 +42,90 @@ public class Probabilidades {
 	public void setNegativeModel(BayesianModel negativeModel) {
 		this.negativeModel = negativeModel;
 	}
+	
+	
+	public Map<Integer, Integer> getClassificationMap() {
+		return classificationMap;
+	}
 
-	public int getNegativeFrequency(){
-		return this.negativeFrequency;
+	public void setClassificationMap(Map<Integer, Integer> classificationMap) {
+		this.classificationMap = classificationMap;
+	}
+
+	/**
+	 * Cria o modelo bayesiano, com as probabilidades de cada palavra, dada a classe,
+	 * bem como o cálculo da priori e as ocorrências de palavras positivas e negativas. 
+	 * @param dataSource
+	 */
+	public void criarModeloBayesiano(DataSource dataSource){
+		manipulator.wordCounter();
+		modelFactory();
+		positiveModel.setPriori(priori(1, dataSource));
+		negativeModel.setPriori(priori(0, dataSource));
+		Set<String> palavras = positiveOccurrences.keySet();
+		for(String palavra: palavras){
+			calcularProbabilidadePorPalavra(palavra);
+		}
+		
 	}
 	
-	public void setNegativeFrequency(int negativeFrequency){
-		this.negativeFrequency = negativeFrequency;
+	public void calculaPosteriori(DataSource dataSource){
+		classificationMap = new HashMap<Integer, Integer>();
+		for(Map.Entry<Integer, String> entry: dataSource.getText().entrySet()){
+			
+			double pdhp = 0, pdhn = 0;
+			double posteriorip = 0, posteriorin = 0;
+			String tweet = entry.getValue();
+			Scanner sc = new Scanner(tweet);
+			while(sc.hasNext())	{
+				String palavra = sc.next();
+				if(positiveModel.getProbabilidadeDadaClasse().containsKey(palavra)){
+					pdhp = pdhp + Math.log10(positiveModel.getProbabilidadeDadaClasse().get(palavra));
+				}
+					
+				if(negativeModel.getProbabilidadeDadaClasse().containsKey(palavra)){
+					pdhn = pdhn + Math.log10(negativeModel.getProbabilidadeDadaClasse().get(palavra));
+				}
+				
+				
+			}
+			
+			posteriorip = Math.log10(positiveModel.getPriori()) + pdhp;
+			posteriorin = Math.log10(negativeModel.getPriori()) + pdhn;
+			
+			if(posteriorip > posteriorin){
+				classificationMap.put(entry.getKey(), 1);
+				
+			}else{
+				classificationMap.put(entry.getKey(), 0);
+				
+				
+			}
+			sc.close();
+		}
 	}
 	
-	public int getPositiveFrequency(){
-		return this.positiveFrequency;
+	public double calculoAcuracia(DataSource dataSource){
+		Map<Integer, Integer> sentiments = dataSource.getSentiment();
+		int acertos = 0;
+		for (Map.Entry<Integer, Integer> entry : sentiments.entrySet()){
+			if(entry.getValue() == classificationMap.get(entry.getKey())){
+				acertos++;
+			}
+		}
+		
+		return (double)acertos/ sentiments.size();
 	}
 	
-	public void setPositiveFrequency(int positiveFrequency){
-		this.positiveFrequency=positiveFrequency;
-	}
+	
+	
 	/**
 	 * Calcula a priori, dado um sentimento. A priori é calculada pela frequência 
 	 * de cada classe no conjunto de dados.
 	 * @param sentiment classe do sentimento
 	 * @return a frequência da classe passada por parâmetro.
 	 */
-	public double priori(int sentiment, DataSource dataSource){
+	private double priori(int sentiment, DataSource dataSource){
 		
 		return (double) Collections.frequency(dataSource.getSentiment().values(), sentiment)/ dataSource.getSentiment().size();
 		
@@ -84,24 +150,6 @@ public class Probabilidades {
 		negativeModel.setTamanhoVocabulario(manipulator.getTotalNegativeOccurrences());
 	}
 	
-	/**
-	 * Calcula a posteriori, dado um conjunto de dados para treinamento. A posteriori é 
-	 * calculada para cada palavra do vocabulário. 
-	 * @param dataSource
-	 */
-	public void calcularPosteriori(DataSource dataSource){
-		manipulator = new TextManipulator(dataSource);
-		manipulator.wordCounter();
-		modelFactory();
-		positiveModel.setPriori(priori(1, dataSource));
-		negativeModel.setPriori(priori(0, dataSource));
-		Set<String> palavras = positiveOccurrences.keySet();
-		for(String palavra: palavras){
-			calcularProbabilidadePorPalavra(palavra);
-		}
-		
-	}
-	
 	
 	/**
 	 * Sem fazer o Laplace, por enquanto
@@ -119,17 +167,13 @@ public class Probabilidades {
 			positiveModel.getProbabilidadeDadaClasse().put(palavra, 1.0);
 			return;
 		}else{
-			double probabilidadePositivo = positiveOccurrences.get(palavra)/manipulator.getTotalPositiveOccurrences();
+			double probabilidadePositivo = (double)(positiveOccurrences.get(palavra) + 1)/(manipulator.getTotalPositiveOccurrences() + positiveOccurrences.size());
 			positiveModel.getProbabilidadeDadaClasse().put(palavra, probabilidadePositivo);
 			
-			double probabilidadeNegativo = negativeOccurrences.get(palavra)/manipulator.getTotalNegativeOccurrences();
+			double probabilidadeNegativo = (double)(negativeOccurrences.get(palavra) + 1)/( manipulator.getTotalNegativeOccurrences() + negativeOccurrences.size());
 			negativeModel.getProbabilidadeDadaClasse().put(palavra, probabilidadeNegativo);
 		}
 		
 	}
 	
-	//FIXME implementar aqui, se necessário.
-	private int estimativaLaplace(Map<String, Integer> frequencias){
-		return Collections.frequency(frequencias.values(), 0);
-	}
 }

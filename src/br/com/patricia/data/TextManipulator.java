@@ -49,7 +49,6 @@ public class TextManipulator {
 	 */
 	public void wordCounter(){
 		
-		
 		for (Map.Entry<Integer, String> entry : dataSource.getText().entrySet()){
 			Scanner sc = new Scanner(entry.getValue());
 			
@@ -87,21 +86,5 @@ public class TextManipulator {
 		}
 		
 	}
-	
-	
-	//FIXME Não usar, por enquanto
-	private String removeInitialDigit(String s){
-		return s.replaceAll("\\d","");
-		
-	}
-	
-	
-	//FIXME Não usar, por enquanto
-	private String removeSpecialCharacters(String s){
-		String result = s.replaceAll("[^\\w\\s]"," ").toLowerCase();
-		
-		return result;
-	}
-	
 
 }
