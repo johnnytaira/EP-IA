@@ -53,6 +53,13 @@ public class Reader {
 
 	}
 
+	/**
+	 * Adiciona todos os dados coletados do csv para o {@link DataSource}
+	 * 
+	 * @param id
+	 * @param sentiment
+	 * @param text
+	 */
 	protected void addToDataSource(int id, int sentiment, StringBuilder text) {
 		dataSource.getSentiment().put(id, sentiment);
 		dataSource.getText().put(id, text.toString());
@@ -88,7 +95,6 @@ public class Reader {
 					count++;
 			} else if (count == 1 && c != ',') {
 				sentiment = Character.getNumericValue(c);
-				// count++;
 			} else if (c == ',' && count < 3) {
 				count++;
 				continue;

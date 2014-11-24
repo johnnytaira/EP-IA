@@ -1,11 +1,18 @@
 package br.com.patricia.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-//FIXME
+/**
+ * Implementação de {@link Reader} específica para a remoção de stop-words do conjunto de dados.
+ * Sobrescreve o método {@link #addToDataSource(int, int, StringBuilder) addToDataSource(id, sentiment, text)
+ * @author Johnny Taira
+ *
+ */
 public class StopWordReader extends Reader {
 
 	public StopWordReader(DataSource datasource) {
@@ -15,21 +22,23 @@ public class StopWordReader extends Reader {
 	@Override
 	protected void addToDataSource(int id, int sentiment, StringBuilder text) {
 		String stringedText = text.toString();
-
 		Scanner sc = new Scanner(stringedText);
+		List<String> fraseBuffer = new ArrayList<String>();
 		while (sc.hasNext()) {
 			String palavra = sc.next();
-			if (stopWords.contains(palavra.toUpperCase())) {
-				int indicePalavra = text.indexOf(palavra);
-				System.out.println("here: " + palavra + " "
-						+ text.indexOf(palavra));
+			if (!stopWords.contains(palavra.toUpperCase())) {
+				fraseBuffer.add(palavra);
 			}
 		}
-
 		sc.close();
 
+		StringBuilder builder = new StringBuilder();
+		for (String cu : fraseBuffer) {
+			builder.append(cu + " ");
+		}
+
 		dataSource.getSentiment().put(id, sentiment);
-		dataSource.getText().put(id, stringedText);
+		dataSource.getText().put(id, builder.toString());
 	}
 
 	private String[] temp = new String[] { "A", "A'S", "ABLE", "ABOUT",

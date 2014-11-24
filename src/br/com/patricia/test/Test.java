@@ -29,11 +29,11 @@ public class Test {
 	// FIXME: mudar para receber via argumento
 	public static void main(String[] args) {
 		// String path = args[0];
-		String path = "/Users/Johnny Taira/Desktop/dummy.csv";
+		String path = "/Users/Johnny Taira/Desktop/Sentiment Analysis Dataset.csv";
 		Scanner sc = new Scanner(System.in);
 
-		System.out.println("Digite a opção que você deseja: " + "\n1:Holdout "
-				+ "\n2:CrossValidation");
+		System.out
+				.println("Digite a opção que você deseja: " + "\n1:Holdout " + "\n2:CrossValidation");
 		int opcao = sc.nextInt();
 
 		sc.close();
@@ -41,12 +41,11 @@ public class Test {
 		DataSource dataSource = new DataSource();
 		Reader reader = new StopWordReader(dataSource);
 		reader.readCSV(path);
-		System.out.println(dataSource.getText());
 		DataSourceFactory data = null;
-
+		// System.out.println(dataSource.getText());
 		if (opcao == 1) {
 			data = new DataSourceFactory(dataSource);
-			holdout(data, args[1]);
+			holdout(data, null);
 		} else if (opcao == 2) {
 			data = new DataSourceFactory(dataSource, 10);
 			crossValidation(data);
@@ -59,7 +58,6 @@ public class Test {
 	private static void crossValidation(DataSourceFactory factory) {
 		List<DataSource> dataSources = factory.getDataSources();
 		List<Double> arrayStats = new ArrayList<Double>();
-		System.out.println(dataSources.size());
 		for (int i = 0; i < dataSources.size(); i++) {
 			DataSource testing = dataSources.get(i);
 			List<DataSource> temp = new ArrayList<DataSource>();
@@ -72,7 +70,7 @@ public class Test {
 			p.criarModeloBayesiano(training);
 			p.calculaPosteriori(testing);
 			arrayStats.add(p.calculoAcuracia(testing));
-			System.out.println(p.calculoAcuracia(testing));
+			// System.out.println(p.calculoAcuracia(testing));
 			temp.remove(testing);
 		}
 
