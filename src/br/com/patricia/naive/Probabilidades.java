@@ -88,14 +88,23 @@ public class Probabilidades {
 			Scanner sc = new Scanner(tweet);
 			while (sc.hasNext()) {
 				String palavra = sc.next();
+				// O cálculo do log previne o underflow
 				if (positiveModel.getProbabilidadeDadaClasse().containsKey(
 						palavra)) {
+					pdhp = pdhp + Math.log10(positiveModel
+							.getProbabilidadeDadaClasse().get(palavra));
+				} else {
+					calcularProbabilidadePorPalavra(palavra);
 					pdhp = pdhp + Math.log10(positiveModel
 							.getProbabilidadeDadaClasse().get(palavra));
 				}
 
 				if (negativeModel.getProbabilidadeDadaClasse().containsKey(
 						palavra)) {
+					pdhn = pdhn + Math.log10(negativeModel
+							.getProbabilidadeDadaClasse().get(palavra));
+				} else {
+					calcularProbabilidadePorPalavra(palavra);
 					pdhn = pdhn + Math.log10(negativeModel
 							.getProbabilidadeDadaClasse().get(palavra));
 				}
@@ -189,17 +198,36 @@ public class Probabilidades {
 			positiveModel.getProbabilidadeDadaClasse().put(palavra, 1.0);
 			return;
 		} else {
-			double probabilidadePositivo = (double) (positiveOccurrences
-					.get(palavra) + 1) / (manipulator
-					.getTotalPositiveOccurrences() + positiveOccurrences.size());
+			double probabilidadePositivo, probabilidadeNegativo;
+			if (positiveOccurrences.containsKey(palavra)) {
+				probabilidadePositivo = (double) (positiveOccurrences
+						.get(palavra) + 1) / (manipulator
+						.getTotalPositiveOccurrences() + positiveOccurrences
+						.size());
+
+			} else {// Palavra nova no conjunto de testes
+				probabilidadePositivo = (double) (1 + 1) / (manipulator
+						.getTotalPositiveOccurrences() + positiveOccurrences
+						.size());
+			}
 			positiveModel.getProbabilidadeDadaClasse().put(palavra,
 					probabilidadePositivo);
 
-			double probabilidadeNegativo = (double) (negativeOccurrences
-					.get(palavra) + 1) / (manipulator
-					.getTotalNegativeOccurrences() + negativeOccurrences.size());
+			if (negativeOccurrences.containsKey(palavra)) {
+				probabilidadeNegativo = (double) (negativeOccurrences
+						.get(palavra) + 1) / (manipulator
+						.getTotalNegativeOccurrences() + negativeOccurrences
+						.size());
+
+			} else {// Palavra nova no conjunto de testes
+				probabilidadeNegativo = (double) (1 + 1) / (manipulator
+						.getTotalNegativeOccurrences() + negativeOccurrences
+						.size());
+			}
+
 			negativeModel.getProbabilidadeDadaClasse().put(palavra,
 					probabilidadeNegativo);
+
 		}
 
 	}

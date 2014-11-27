@@ -13,13 +13,13 @@ import org.apache.commons.collections4.ListUtils;
 import br.com.patricia.data.DataSource;
 import br.com.patricia.data.DataSourceFactory;
 import br.com.patricia.data.Reader;
-import br.com.patricia.data.StopWordReader;
 import br.com.patricia.data.TextManipulator;
 import br.com.patricia.naive.BayesianModel;
 import br.com.patricia.naive.Probabilidades;
 
 /**
- * Classe para realização de testes.
+ * Classe apenas para realização de testes internos. Desconsiderar.
+ *
  * 
  * @author Johnny Taira
  *
@@ -37,9 +37,9 @@ public class Test {
 		int opcao = sc.nextInt();
 
 		sc.close();
-
+		String stopwords = "C:\\Users\\Johnny Taira\\Desktop\\Inteligência Arrrrrrrrrrrtifisssiallll\\stopwords_en.txt";
 		DataSource dataSource = new DataSource();
-		Reader reader = new StopWordReader(dataSource);
+		Reader reader = new Reader(dataSource);
 		reader.readCSV(path);
 		DataSourceFactory data = null;
 		// System.out.println(dataSource.getText());
