@@ -62,7 +62,7 @@ public class StopWordReader extends Reader {
 			BufferedReader br = new BufferedReader(fr);
 			String line = br.readLine();
 			while (line != null) {
-				stopWords.add(line);
+				stopWords.add(line.toLowerCase());
 				line = br.readLine();
 			}
 
