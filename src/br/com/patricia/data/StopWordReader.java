@@ -64,8 +64,6 @@ public class StopWordReader extends Reader {
 			while (line != null) {
 				stopWords.add(line);
 				line = br.readLine();
-				System.out.println(line);
-
 			}
 
 			br.close();
