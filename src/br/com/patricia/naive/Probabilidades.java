@@ -187,6 +187,13 @@ public class Probabilidades {
 		return (double) acertos / sentiments.size();
 	}
 
+	public double calculoErroPadrao(double erroMedio, double tamanhoConjunto) {
+		double erroPadrao = Math
+				.sqrt((erroMedio * (1 - erroMedio)) / tamanhoConjunto);
+
+		return erroPadrao;
+	}
+
 	/**
 	 * Calcula a priori, dado um sentimento. A priori é calculada pela
 	 * frequência de cada classe no conjunto de dados.

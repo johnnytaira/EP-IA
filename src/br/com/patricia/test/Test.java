@@ -103,6 +103,10 @@ public class Test {
 		System.out
 				.println("H = Negativo: " + porcentagem.format(matrix[0][1]) + " " + porcentagem
 						.format(matrix[1][1]));
+		NumberFormat decimal = NumberFormat.getInstance();
+		decimal.setMinimumFractionDigits(6);
+		System.out.println(decimal.format(ney.calculoErroPadrao(
+				1 - ney.calculoAcuracia(testing), testing.getSize())));
 		// saveToFile(ney.calculoAcuracia(testing), path, ney);
 
 	}
