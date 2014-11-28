@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -42,6 +43,7 @@ public class Test {
 		Reader reader = new Reader(dataSource);
 		reader.readCSV(path);
 		DataSourceFactory data = null;
+
 		// System.out.println(dataSource.getText());
 		if (opcao == 1) {
 			data = new DataSourceFactory(dataSource);
@@ -91,6 +93,16 @@ public class Test {
 		ney.calculaPosteriori(testing);
 
 		System.out.println(ney.calculoAcuracia(testing));
+		double[][] matrix = ney.calculoMatrizConfusao(testing);
+		NumberFormat porcentagem = NumberFormat.getPercentInstance();
+		porcentagem.setMinimumFractionDigits(2);
+		System.out.println("             Acertos  Erros");
+		System.out
+				.println("H = positivo: " + porcentagem.format(matrix[0][0]) + " " + porcentagem
+						.format(matrix[1][0]));
+		System.out
+				.println("H = Negativo: " + porcentagem.format(matrix[0][1]) + " " + porcentagem
+						.format(matrix[1][1]));
 		// saveToFile(ney.calculoAcuracia(testing), path, ney);
 
 	}

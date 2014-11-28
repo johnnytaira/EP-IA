@@ -126,6 +126,48 @@ public class Probabilidades {
 	}
 
 	/**
+	 * Realiza o cálculo da matriz de confusão.
+	 * 
+	 * @param dataSource
+	 * @return matriz de confusão. Primeira coluna indica os verdadeiros
+	 *         positivos, segunda coluna indica os falsos positivos
+	 */
+
+	public double[][] calculoMatrizConfusao(DataSource dataSource) {
+		Map<Integer, Integer> sentiments = dataSource.getSentiment();
+		int acertosPositivos = 0, acertosNegativos = 0, errosPositivos = 0, errosNegativos = 0;
+		for (Map.Entry<Integer, Integer> entry : sentiments.entrySet()) {
+			if (entry.getValue() == classificationMap.get(entry.getKey())) {
+				if (entry.getValue() == 0) {
+					acertosNegativos++;
+				} else {
+					acertosPositivos++;
+				}
+
+			} else {
+				if (entry.getValue() == 0) {
+					errosNegativos++;
+				} else {
+					errosPositivos++;
+				}
+			}
+		}
+		int tamanho = sentiments.size();
+		double[] colunaAcertos = { (double) acertosPositivos / tamanho,
+				(double) acertosNegativos / tamanho };
+		double[] colunaErros = { (double) errosPositivos / tamanho,
+				(double) errosNegativos / tamanho };
+
+		double[][] matrizConfusao = new double[2][];
+
+		matrizConfusao[0] = colunaAcertos;
+		matrizConfusao[1] = colunaErros;
+
+		return matrizConfusao;
+
+	}
+
+	/**
 	 * Método responsável por realizar o cálculo da acurácia do classificador
 	 * implementado.
 	 * 
